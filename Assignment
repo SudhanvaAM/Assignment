@@ -1,0 +1,47 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+vector<int> solve(vector<vector<int>>& towers, int radius) {
+    // Create a set of all possible coordinates within the given radius
+    set<pair<int, int>> coords;
+    for (auto tower : towers) {
+        for (int x = tower[0] - radius; x <= tower[0] + radius; x++) {
+            for (int y = tower[1] - radius; y <= tower[1] + radius; y++) {
+                int d = sqrt(pow(x - tower[0], 2) + pow(y - tower[1], 2));
+                if (d <= radius) {
+                    coords.insert(make_pair(x, y));
+                }
+            }
+        }
+    }
+    
+    // Calculate the network quality for each coordinate
+    pair<int, int> max_coord = make_pair(-1, -1);
+    int max_quality = -1;
+    for (auto coord : coords) {
+        int quality = 0;
+        for (auto tower : towers) {
+            int d = sqrt(pow(coord.first - tower[0], 2) + pow(coord.second - tower[1], 2));
+            if (d <= radius) {
+                quality += floor(tower[2] / (1 + d));
+            }
+        }
+        if (quality > max_quality) {
+            max_quality = quality;
+            max_coord = coord;
+        } else if (quality == max_quality && coord < max_coord) {
+            max_coord = coord;
+        }
+    }
+    
+    // Return the coordinate with maximum network quality
+    return vector<int>{max_coord.first, max_coord.second};
+}
+
+int main() {
+    vector<vector<int>> towers{{1,2,5},{2,1,7},{3,1,9}};
+    int radius = 2;
+    vector<int> max_coord = solve(towers, radius);
+    cout << "[" << max_coord[0] << ", " << max_coord[1] << "]" << endl;
+    return 0;
+}
